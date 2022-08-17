@@ -1,0 +1,20 @@
+{
+  "name": "parking",
+  "version": "1.0.0",
+  "description": "parking 👍",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LongBOI-nekoshka/parkingNodejs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LongBOI-nekoshka/parkingNodejs/issues"
+  },
+  "homepage": "https://github.com/LongBOI-nekoshka/parkingNodejs#readme",
+  "type": "module"
+}
