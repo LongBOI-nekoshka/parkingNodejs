@@ -8,6 +8,10 @@ const r1 = readline.createInterface({
     prompt: question
 })
 
-questionLine.prompt();
+r1.prompt();
 
-r1.on('line')
+r1.on('line',(line) => {
+    switch(line) {
+        
+    }
+})
