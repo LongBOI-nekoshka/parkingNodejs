@@ -40,6 +40,7 @@ export default class Parking {
         this.PeopleParked = [];
     }
     
+    
     park(r1,size, ent, plateNumber) {
         if(!this.#inputChecker(size,ent)) {
             return 'oops wrong input <press enter>';
