@@ -56,6 +56,7 @@ r1.on('line',(line) => {
             })
         break;
         case 'x':
+            console.log(park.generateNearChoices('l','3'))
             process.exit(0);
         break;
     }

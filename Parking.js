@@ -49,7 +49,7 @@ export default class Parking {
             return 'oops duplicate plate number'
         }
         try {
-            let parkingNumber = this.#generateRandomPeopleChoices(size);
+            let parkingNumber = this.generateNearChoices(size,ent);
             let checkHour = this.#checkIfOneOur(plateNumber)
             let parkerInfo = {
                 parkingNumber: parkingNumber,
@@ -205,7 +205,7 @@ export default class Parking {
         return receipt;
     }
 
-    #generateRandomPeopleChoices(size) {
+    generateNearChoices(size,ent) {
         let currentAvalable = this.ParkingSpace.filter((data) => {
             if(size == 's') {
                 return data.isAvailable;
@@ -218,9 +218,6 @@ export default class Parking {
             }
         }).map((data) => data.parkingNumber);
         
-        let randomRangeCalculator = Math.floor(Math.random() * (currentAvalable.length - 1));
-        return currentAvalable[randomRangeCalculator] 
+        return currentAvalable[currentAvalable.length - 1]
     }
-
-
 }
