@@ -7,6 +7,22 @@ export default class Parking {
                     parkingNumber: key,
                     isAvailable: true,
                 }
+                
+                if(key <= 6) {
+                    Object.assign(parkInfo,{
+                        size:'LP'
+                    })
+                }
+                if(key > 6 && key <= 13) {
+                    Object.assign(parkInfo,{
+                        size:'MP'
+                    });
+                }
+                if(key >= 14) {
+                    Object.assign(parkInfo,{
+                        size:'SP'
+                    });
+                }
                 return parkInfo;
         });
         this.Parkers = new Array(21).fill(null).map((data,key) => {
@@ -21,20 +37,23 @@ export default class Parking {
             return parkerInfo;
         });
 
-        this.PeopleParked = new Array();
+        this.PeopleParked = [];
     }
     
     park(r1,size, ent, plateNumber) {
         if(!this.#inputChecker(size,ent)) {
             return 'oops wrong input <press enter>';
         }
-
+        if(this.#checkIfColorum(plateNumber)) {
+            return 'oops duplicate plate number'
+        }
         try {
-            let parkingNumber = this.#generateRandomPeopleChoices();
+            let parkingNumber = this.#generateRandomPeopleChoices(size);
+            let checkHour = this.#checkIfOneOur(plateNumber)
             let parkerInfo = {
                 parkingNumber: parkingNumber,
                 vehicleType: size,
-                startTime: new Date(),
+                startTime:checkHour ? checkHour : new Date(),
                 endTime: null,
                 entrance: ent,
                 plateNumber: plateNumber,
@@ -48,13 +67,13 @@ export default class Parking {
 
             return 'Car '+ this.Parkers[parkingNumber]['plateNumber']+ ' Has parked in ' + parkingNumber;
         }catch(err) {
+            console.log(err);
             r1.question('oops parking is full <press enter>',(data) => {
                 r1.prompt();
             });
         }
 
     }
-    
 
     unpark(parkingNumber, enterEndDate = null) {
         let parkerInfo = {
@@ -71,9 +90,7 @@ export default class Parking {
                 endTime:enterEndDate ? new Date(enterEndDate) : new Date()
             });
         
-            return this.#calculate(parkingNumber);
-
-            this.PeopleParked.push(this.Parkers[parkingNumber]);
+            let receipt = this.#calculate(parkingNumber);
     
             Object.assign(this.Parkers[parkingNumber], {
                 ...parkerInfo
@@ -82,10 +99,42 @@ export default class Parking {
             Object.assign(this.ParkingSpace[parkingNumber], {
                 isAvailable:true
             })
-            return 'Car has been unparked...'
+            return receipt;
         }else {
             return 'This space is empty...'
         }
+    }
+    
+    viewHistoryTemp(plateNumber = null) {
+        if(plateNumber) {
+            this.PeopleParked.filter((data) => {
+                return data.info.plateNumber == plateNumber
+            })
+        }
+        return this.PeopleParked;
+    }
+    
+    viewMap() {
+        return this.ParkingSpace.map((data,key) => {
+            if((key+1) % 7 === 0) {
+                return ' | '+ (data.isAvailable ? 'ok' : 'no') +'-'+ data.size+' '+ key+' | Entrc '
+
+            }
+            return ' | '+ (data.isAvailable ? 'ok' : 'no') +'-'+ data.size+' '+ key
+            
+        });
+    }
+
+    #checkIfOneOur(plateNumber) {
+        let lastOccurenceIndex = this.PeopleParked.map((data) => data.info.plateNumber).lastIndexOf(plateNumber);
+        let current = this.PeopleParked[lastOccurenceIndex];
+        if(lastOccurenceIndex == -1) {
+            return false;
+        }
+        if((Math.abs(current.info.endTime - new Date()) / 36e5) < 1) {
+            return new Date(current.info.endTime)
+        }
+        return false;
     }
 
     #inputChecker(size,ent) {
@@ -99,35 +148,74 @@ export default class Parking {
         return true;
     }
 
+    #checkIfColorum(plateNumber) {
+        let filterPlateNumber = this.Parkers.filter((data) => {
+            return data.plateNumber == plateNumber;
+        });
+        return filterPlateNumber.length == 0 ? false : true;
+    }
+
     #calculate(parkingNumber) {
-        let bill = 0;
+        let bill = 40;
+        let billMultiplier = 0;
         let multiplier = 0;
         let penaltyMultiplier = 0;
         let parkerInfo = this.Parkers[parkingNumber];
         let hoursRendered = Math.round(Math.abs(parkerInfo.endTime - parkerInfo.startTime) / 36e5);
+        
         if(hoursRendered > 24) {
             penaltyMultiplier = Math.round(hoursRendered/24);
-            multiplier = hoursRendered - (24 * penaltyMultiplier)
+            multiplier =  hoursRendered - (24 * penaltyMultiplier - 1)
         }else {
             multiplier = hoursRendered;
         }
-        switch(parkerInfo.size) {
-            case 's':
-                bill = 20;
+
+        switch(this.ParkingSpace[parkingNumber].size) {
+            case 'SP':
+                billMultiplier = 20;
                 break;
-            case 'm':
-                bill = 60;
+            case 'MP':
+                billMultiplier = 60;
                 break;
-            case 'l':
-                bill = 100;
+            case 'LP':
+                billMultiplier = 100;
                 break;
         }
-        return penaltyMultiplier+' '+multiplier+' '+hoursRendered
+
+        let receipt = {
+            'penalty ':penaltyMultiplier,
+            'penalty Charge': this.PENALTY,
+            'total penalty charge': this.PENALTY * penaltyMultiplier,
+            'regular ': multiplier,
+            'regular charge': billMultiplier,
+            'total regular charge': billMultiplier * multiplier,
+            'entry fee': bill,
+            'total hours rendered': hoursRendered,
+            'start time':new Date(parkerInfo.startTime).toLocaleString(),
+            'end time':new Date(parkerInfo.endTime).toLocaleString(),
+            'parksize ': this.ParkingSpace[parkingNumber].size,
+            'total':bill + (this.PENALTY * penaltyMultiplier) + ( billMultiplier * multiplier)
+        }
+        this.PeopleParked.push({info:{
+            startTime: parkerInfo.startTime,
+            endTime: parkerInfo.endTime,
+            plateNumber: parkerInfo.plateNumber
+        },reciept:receipt});
+
+        return receipt;
     }
 
-    #generateRandomPeopleChoices() {
+    #generateRandomPeopleChoices(size) {
         let currentAvalable = this.ParkingSpace.filter((data) => {
-            return data.isAvailable;
+            if(size == 's') {
+                return data.isAvailable;
+            }
+            if(size == 'm') {
+                return data.isAvailable && (data.size == 'MP' || data.size == 'LP')
+            }
+            if(size == 'l') {
+                return data.isAvailable && data.size == 'LP';
+            }
         }).map((data) => data.parkingNumber);
         
         let randomRangeCalculator = Math.floor(Math.random() * (currentAvalable.length - 1)) + 1;

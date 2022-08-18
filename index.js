@@ -3,7 +3,7 @@ import Parking from './Parking.js';
 
 const park = new Parking();
 
-const question  = 'Select an action p/P - park | u/U - unpark | m/M - view map | s/S - view Stats: '
+const question  = 'Select an action p/P - park | u/U - unpark | m/M - view map | h/H - view History: | x/X - Test: '
 const r1 = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -29,16 +29,34 @@ r1.on('line',(line) => {
                 if(num.includes("--endDate")) {
                     r1.question('enter an end date: ', function(enddate) {
                         console.log(park.unpark(parseInt(num.replace('--endDate','')),enddate))
+                        console.log('Car has been unparked...')
+                        r1.prompt();
                     }) 
                 }else {
                     console.log(park.unpark(num))
+                    console.log('Car has been unparked...')
+                    r1.prompt();
+                }
+            })
+        break;
+        case 'm':
+            console.log((park.viewMap().toString().replace(/((?:[^,]*,){6}[^,]*),/g,'$1\n')).replace(/,/g,'  |  '))
+            r1.prompt();
+        break;
+        case 'h':
+            r1.question('search a plate number? y/n' , function(ans) {
+                if(ans == 'y') {
+                    r1.question('platenumber: ' , function(plate) {
+                        console.log(park.viewHistoryTemp(plate))
+                    })
+                }else {
+                    console.log(park.viewHistoryTemp())
                 }
                 r1.prompt();
             })
         break;
-        case 'm':
-        break;
-        case 's':
+        case 'x':
+            process.exit(0);
         break;
     }
 })
