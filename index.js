@@ -3,7 +3,7 @@ import Parking from './Parking.js';
 
 const park = new Parking();
 
-const question  = 'Select an action p/P - park | u/U - unpark | m/M - view map | h/H - view History: | x/X - Test: '
+const question  = 'Select an action p/P - park | u/U - unpark | m/M - view map | h/H - view History: | x/X - exit: '
 const r1 = readline.createInterface({
     input: process.stdin,
     output: process.stdout,

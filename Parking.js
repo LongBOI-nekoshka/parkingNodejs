@@ -67,7 +67,6 @@ export default class Parking {
 
             return 'Car '+ this.Parkers[parkingNumber]['plateNumber']+ ' Has parked in ' + parkingNumber;
         }catch(err) {
-            console.log(err);
             r1.question('oops parking is full <press enter>',(data) => {
                 r1.prompt();
             });
@@ -218,7 +217,7 @@ export default class Parking {
             }
         }).map((data) => data.parkingNumber);
         
-        let randomRangeCalculator = Math.floor(Math.random() * (currentAvalable.length - 1)) + 1;
+        let randomRangeCalculator = Math.floor(Math.random() * (currentAvalable.length - 1));
         return currentAvalable[randomRangeCalculator] 
     }
 
