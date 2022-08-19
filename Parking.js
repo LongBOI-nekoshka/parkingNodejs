@@ -217,7 +217,31 @@ export default class Parking {
                 return data.isAvailable && data.size == 'LP';
             }
         }).map((data) => data.parkingNumber);
-        
-        return currentAvalable[currentAvalable.length - 1]
+        let sort = this.returnIdealSort(ent).filter((data) => currentAvalable.includes(data))
+        return sort[currentAvalable.length - 1]
+    }
+
+    returnIdealSort(ent) {
+        ent = parseInt(ent)
+        switch(ent) {
+            case 1:
+                return [
+                    6,5,13,12,4,20,3,
+                    11,19,2,10,18,1,
+                    9,17,0,8,16,7,15,14
+                ].reverse();
+            case 2:
+                return [
+                    13,6,20,12,5,19,11,
+                    4,18,10,3,17,9,2,16,
+                    8,1,15,7,0,14
+                ].reverse();
+            case 3:
+                return [
+                    20,19,13,18,12,6,
+                    17,11,5,16,10,4,15,
+                    9,3,14,8,2,7,1,0
+                ].reverse();
+        }
     }
 }
