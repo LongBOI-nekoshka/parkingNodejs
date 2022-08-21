@@ -166,8 +166,10 @@ export default class Parking {
         if(hoursRendered > 24) {
             penaltyMultiplier = Math.round(hoursRendered/24);
             multiplier =  hoursRendered - (24 * penaltyMultiplier - 1)
-        }else {
-            multiplier = hoursRendered;
+        }
+        
+        if(hoursRendered > 3) {
+            multiplier = hoursRendered-3;
         }
 
         switch(this.ParkingSpace[parkingNumber].size) {
